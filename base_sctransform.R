@@ -157,7 +157,24 @@ sctransform_base <- function(raw.count, return.data = c('correct_mat', 'list')[2
   return(data)
 }
 
-pbmc <- readRDS('./pbmc.rds')
+#load data                                                     
+#https://cf.10xgenomics.com/samples/cell/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz
+pbmcmat <- Read10X(data.dir = './filtered_gene_bc_matrices/hg19/')
+meta <- read.table(sep = '\t', file = './metadata.txt')
+feature <- read.table(file = 'features.txt')
+colnames(pbmcmat) <- gsub('-1','',colnames(pbmcmat))
+pbmcmat <- pbmcmat[features,rownames(meta)]
+dim(pbmcmat)
+#12519  2638                                                     
+pbmc <- CreateSeuratObject(counts = pbmcmat, meta.data = meta)
+pbmc <- SCTransform(pbmc)
+pbmc <- RunPCA(pbmc)
+pbmc <- FindNeighbors(pbmc, dims = 1:30)
+pbmc <- FindClusters(pbmc, dims = 1:30, resolution = 1.8)
+pbmc <- RunUMAP(pbmc, dims = 1:30)
+DimPlot(pbmc, group.by = 'Annotation_SCT')
+                                                     
+#Perform normalization by basic function                                                     
 datalist <- sctransform_base(pbmc@assays$RNA@counts, smooth_th = 10, min_cells = 5)
 library(Seurat)
 assay.out <- CreateAssayObject(counts = datalist$count)
@@ -180,4 +197,4 @@ pbmc <- FindNeighbors(pbmc, dims = 1:30)
 pbmc <- FindClusters(pbmc, dims = 1:30, resolution = 1.8)
 pbmc <- RunUMAP(pbmc, dims = 1:30)
 DimPlot(pbmc, label = T)
-DimPlot(pbmc, group.by = 'Annotation')
+DimPlot(pbmc, group.by = 'Annotation_SCT')
