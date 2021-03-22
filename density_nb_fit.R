@@ -51,10 +51,11 @@ model_nb <- function(object, cluster, cut.off = 0.3, residual = .Machine$double.
 library("reticulate")
 library(ggplot2)
 # Set the path to the Python executable file
-#use_python("/BGFS1/home/huangzh/.conda/envs/hzhpy3.6/bin/python", required = T)
+#use_python("~/bin/python", required = T)
 # Check the version of Python.
 #py_config()
 source_python('./optimize_curve_fit.py')
+#Load data. https://cf.10xgenomics.com/samples/cell/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz
 pbmcmat <- Read10X(data.dir = './filtered_gene_bc_matrices/hg19/')
 dim(pbmcmat)
 #[1] 32738  2700
