@@ -4,9 +4,9 @@ source('pca.velocity.plot.simplify.R')
 emat <- read.table('emat.txt')
 nmat <- read.table('nmat.txt')
 comdf <- read.table('cell_cluster.txt', header = T)
-cluster.label <- factor(comdf$cluster)
-names(cluster.label) <- comdf$cellID
-cell.colors = MUDAN:::fac2col(cluster.label)
+cell.colors <- comdf$color
+names(cell.colors) <- comdf$cellID
+
 ## RNA velocity model without pooling
 rvel.cd.unpooled <- velocity.estimates.simplify(emat, nmat,
                                                      fit.quantile = 0.05,
@@ -52,7 +52,7 @@ head(epc@scores)
 ccdf <- as.data.frame(epc@scores)
 ccdf <- cbind(ccdf, seus4@meta.data[,c('S.Score','G2M.Score','Phase')])
 ggplot(ccdf, aes(PC1, PC2, color = Phase)) + geom_point() + theme_bw() 
-ggplot(ccdf, aes(PC1, PC2, color = S.Score)) + geom_point() + theme_bw() +
+p1 <- ggplot(ccdf, aes(PC1, PC2, color = S.Score)) + geom_point() + theme_bw() +
   scale_color_gradientn(colours = c('grey','yellow','red'))
-ggplot(ccdf, aes(PC1, PC2, color = G2M.Score)) + geom_point() + theme_bw() +
+p2 <- ggplot(ccdf, aes(PC1, PC2, color = G2M.Score)) + geom_point() + theme_bw() +
   scale_color_gradientn(colours = c('grey','yellow','red'))

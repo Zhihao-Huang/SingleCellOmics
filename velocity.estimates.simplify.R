@@ -1,6 +1,5 @@
 velocity.estimates.simplify <- function(emat,nmat,deltaT=1,steady.state.cells=colnames(emat),
-                                        mult=1e3,min.nmat.smat.correlation=0.05,
-                                        min.nmat.emat.correlation=0.05, min.nmat.emat.slope=0.05, 
+                                        mult=1e3, min.nmat.emat.correlation=0.05, min.nmat.emat.slope=0.05, 
                                         zero.offset=FALSE,deltaT2=1, fit.quantile=NULL, 
                                         diagonal.quantiles=FALSE, kCells = 1,
                                         do.par=TRUE,  n.cores=4) {
@@ -15,16 +14,9 @@ velocity.estimates.simplify <- function(emat,nmat,deltaT=1,steady.state.cells=co
   emat.cs <- emat.size[colnames(emat)]/mult;
   nmat.cs <- nmat.size[colnames(nmat)]/mult;
   emat.log.norm <- log(as.matrix(t(t(emat)/emat.cs))+pcount);
-  conv.emat <- emat
-  conv.nmat <- nmat
-  conv.emat.cs <- emat.cs
-  conv.nmat.cs <- nmat.cs
   # size-normalized counts
-  conv.emat.norm <- t(t(conv.emat)/conv.emat.cs)
-  conv.nmat.norm <- t(t(conv.nmat)/conv.nmat.cs)
-  # size-normalized counts
-  emat.norm <- t(t(emat)/emat.cs)
-  nmat.norm <- t(t(nmat)/nmat.cs)
+  conv.emat.norm <- t(t(emat)/emat.cs)
+  conv.nmat.norm <- t(t(nmat)/nmat.cs)
   resl$conv.nmat.norm <- conv.nmat.norm;
   resl$conv.emat.norm <- conv.emat.norm;
   cat("fitting gamma coefficients ... ")
@@ -35,10 +27,12 @@ velocity.estimates.simplify <- function(emat,nmat,deltaT=1,steady.state.cells=co
     #########################################
     ###equivalent to: 
     ###zi <- emat < 1; 
-    ###proportion of cells that spliced (exonic) count < 1.
+    ###proportion of cells that spliced (exonic) count ~ 0,
+    ###while intronic count exsist, which indicates extraneous transcripts.
+    ###o was defined as average counts of specific intronic reads.
     ###o <-  sum(df$n[zi])/(sum(zi)+1)
     #########################################
-    zi <- df$e<1/conv.emat.cs[steady.state.cells]; 
+    zi <- df$e<1/emat.cs[steady.state.cells]; 
     if(any(zi)) { o <- sum(df$n[zi])/(sum(zi)+1)} 
     df$o <- o;
     eq <- quantile(df$e,p=c(fit.quantile,1-fit.quantile))
